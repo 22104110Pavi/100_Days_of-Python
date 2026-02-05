@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      AI-Based Human–Industry Interaction Analysis for Safety Management
+    </title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__logo"></div>
+          <div>
+            <p class="sidebar__eyebrow">SafetySense Console</p>
+            <h1>Industrial Monitoring</h1>
+          </div>
+        </div>
+        <nav class="sidebar__nav">
+          <button class="nav-item active" data-target="dashboard">
+            <span>📊</span> Dashboard
+          </button>
+          <button class="nav-item" data-target="industrial">
+            <span>🏭</span> Industrial Parameters
+          </button>
+          <button class="nav-item" data-target="workers">
+            <span>🧑‍🏭</span> Worker Parameters
+          </button>
+          <button class="nav-item" data-target="alerts">
+            <span>🚨</span> Alerts
+          </button>
+          <button class="nav-item" data-target="log">
+            <span>🧾</span> Log
+          </button>
+        </nav>
+        <div class="sidebar__footer">
+          <p>ThingSpeak Ingest</p>
+          <span id="ingest-status" class="status-pill">Offline</span>
+          <p class="sidebar__timestamp">Last update: <span id="last-update">—</span></p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="page-header">
+          <div>
+            <p class="page-header__eyebrow">AI-Based Human–Industry Interaction Analysis</p>
+            <h2>AI-Based Human–Industry Interaction Analysis for Safety Management</h2>
+            <p class="page-header__subtitle">
+              Random Forest hazard classification and Isolation Forest anomaly
+              detection on multi-sensor environmental and worker telemetry.
+            </p>
+          </div>
+          <div class="page-header__actions">
+            <button class="ghost" type="button">Export Report</button>
+            <button class="primary" type="button">Configure Channels</button>
+          </div>
+        </header>
+
+        <section class="panel" id="dashboard">
+          <div class="panel__header">
+            <h3>Operational Dashboard</h3>
+            <p>
+              Unified hazard intelligence from ThingSpeak feeds using Random Forest
+              scoring.
+            </p>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <p>Hazard Classification</p>
+              <h4 id="hazard-label">Loading…</h4>
+              <span id="hazard-score">Hazard score: --</span>
+            </div>
+            <div class="kpi-card">
+              <p>Anomaly Screening</p>
+              <h4 id="anomaly-label">Pending</h4>
+              <span id="anomaly-score">Anomaly score: --</span>
+            </div>
+            <div class="kpi-card">
+              <p>Active Environment Sensors</p>
+              <h4>Temperature, Humidity</h4>
+              <span>MQ135, GP2Y1010AUF, LM393</span>
+            </div>
+            <div class="kpi-card">
+              <p>Active Worker Sensors</p>
+              <h4>MAX30102 + MPU6050</h4>
+              <span>Body Temperature (planned)</span>
+            </div>
+          </div>
+          <div class="chart-card chart-card--wide">
+            <h4>Random Forest Hazard Trend (All Signals)</h4>
+            <canvas id="chart-hazard"></canvas>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="industrial">
+          <div class="panel__header">
+            <h3>Industrial Parameters</h3>
+            <p>Environmental sensor trends from the industrial floor.</p>
+          </div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <h4>Temperature (°C)</h4>
+              <canvas id="chart-temp"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>Humidity (%)</h4>
+              <canvas id="chart-humidity"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>MQ135 Air Quality (ppm)</h4>
+              <canvas id="chart-mq135"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>GP2Y1010AUF Dust (µg/m³)</h4>
+              <canvas id="chart-dust"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>LM393 Sound (dB)</h4>
+              <canvas id="chart-sound"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="workers">
+          <div class="panel__header">
+            <h3>Worker Parameters</h3>
+            <p>
+              Track heart rate, SpO₂, fall detection, and body temperature to
+              recommend micro breaks.
+            </p>
+          </div>
+          <div class="worker-panel">
+            <div class="worker-panel__controls">
+              <div>
+                <label for="worker-id">Worker ID</label>
+                <select id="worker-id">
+                  <option value="W-001">W-001</option>
+                  <option value="W-002">W-002</option>
+                  <option value="W-003">W-003</option>
+                </select>
+              </div>
+              <div>
+                <label for="worker-name">Worker Name</label>
+                <input id="worker-name" type="text" placeholder="Enter name" />
+              </div>
+              <div>
+                <label for="worker-phone">Mobile Number</label>
+                <input id="worker-phone" type="tel" placeholder="+91 90000 00000" />
+              </div>
+            </div>
+            <div class="worker-panel__summary">
+              <div>
+                <h4>Wellness Recommendation</h4>
+                <p id="worker-recommendation">Pending data ingestion.</p>
+              </div>
+              <div>
+                <h4>Stress Indicator</h4>
+                <p id="worker-stress">Awaiting MAX30102 inputs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <h4>Heart Rate (bpm)</h4>
+              <canvas id="chart-heart"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>SpO₂ (%)</h4>
+              <canvas id="chart-spo2"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>Fall Detection (MPU6050)</h4>
+              <canvas id="chart-motion"></canvas>
+            </article>
+            <article class="chart-card">
+              <h4>Body Temperature (°C)</h4>
+              <canvas id="chart-body-temp"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="alerts">
+          <div class="panel__header">
+            <h3>Alert Center</h3>
+            <p>
+              Automated alerts when thresholds or anomaly scores indicate unsafe
+              conditions.
+            </p>
+          </div>
+          <div class="alert-grid" id="alert-grid"></div>
+        </section>
+
+        <section class="panel hidden" id="log">
+          <div class="panel__header">
+            <h3>System Log</h3>
+            <p>Consolidated ThingSpeak records for audit and analysis.</p>
+          </div>
+          <div class="log-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Temp</th>
+                  <th>Humidity</th>
+                  <th>MQ135</th>
+                  <th>Dust</th>
+                  <th>Sound</th>
+                  <th>Heart Rate</th>
+                  <th>SpO₂</th>
+                  <th>Motion</th>
+                  <th>Body Temp</th>
+                </tr>
+              </thead>
+              <tbody id="log-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
